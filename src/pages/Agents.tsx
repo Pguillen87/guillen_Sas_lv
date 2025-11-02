@@ -86,10 +86,15 @@ const Agents = () => {
               <h1 className="text-3xl font-bold gradient-text">Agentes de IA</h1>
               <p className="text-muted-foreground mt-1">Gerencie seus agentes conversacionais</p>
             </div>
-            <Button onClick={() => navigate("/agents/new")} className="bg-gradient-primary hover:opacity-90">
-              <Plus className="mr-2 h-4 w-4" />
-              Novo Agente
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => navigate("/agents/templates")} variant="outline">
+                Ver Templates
+              </Button>
+              <Button onClick={() => navigate("/agents/new")} className="bg-gradient-primary hover:opacity-90">
+                <Plus className="mr-2 h-4 w-4" />
+                Novo Agente
+              </Button>
+            </div>
           </div>
 
           <div className="relative">

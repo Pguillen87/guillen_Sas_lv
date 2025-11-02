@@ -59,6 +59,11 @@ const Layout = ({ children }: LayoutProps) => {
       icon: TrendingUp,
       path: "/reports",
     },
+    {
+      label: "Planos",
+      icon: TrendingUp,
+      path: "/pricing",
+    },
   ];
 
   return (

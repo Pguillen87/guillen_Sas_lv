@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import Layout from "@/components/Layout";
 
 const NewAgent = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -20,6 +21,20 @@ const NewAgent = () => {
     temperature: 0.7,
     maxTokens: 1000,
   });
+
+  useEffect(() => {
+    // Load template if coming from templates page
+    const template = (location.state as any)?.template;
+    if (template) {
+      setFormData({
+        name: template.name,
+        description: template.description,
+        customPrompt: template.prompt,
+        temperature: 0.7,
+        maxTokens: 1000,
+      });
+    }
+  }, [location]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

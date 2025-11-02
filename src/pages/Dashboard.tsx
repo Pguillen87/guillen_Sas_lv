@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
   Bot,
@@ -14,6 +13,9 @@ import {
   Sparkles,
 } from "lucide-react";
 import Layout from "@/components/Layout";
+import DashboardCharts from "@/components/DashboardCharts";
+import { subDays, format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -25,9 +27,16 @@ const Dashboard = () => {
     appointmentsToday: 0,
   });
 
+  const [chartData, setChartData] = useState({
+    messages: [0, 0, 0, 0, 0, 0, 0],
+    conversations: [0, 0, 0, 0, 0, 0, 0],
+    labels: [] as string[],
+  });
+
   useEffect(() => {
     checkAuth();
     loadStats();
+    loadChartData();
   }, []);
 
   const checkAuth = async () => {
@@ -77,6 +86,42 @@ const Dashboard = () => {
       console.error("Error loading stats:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadChartData = async () => {
+    try {
+      const labels: string[] = [];
+      const messages: number[] = [];
+      const conversations: number[] = [];
+
+      for (let i = 6; i >= 0; i--) {
+        const date = subDays(new Date(), i);
+        const dateStr = format(date, "yyyy-MM-dd");
+        labels.push(format(date, "EEE", { locale: ptBR }));
+
+        // Count messages
+        const { count: msgCount } = await supabase
+          .from("messages")
+          .select("*", { count: "exact", head: true })
+          .gte("sent_at", dateStr)
+          .lt("sent_at", format(subDays(date, -1), "yyyy-MM-dd"));
+
+        messages.push(msgCount || 0);
+
+        // Count conversations
+        const { count: convCount } = await supabase
+          .from("conversations")
+          .select("*", { count: "exact", head: true })
+          .gte("created_at", dateStr)
+          .lt("created_at", format(subDays(date, -1), "yyyy-MM-dd"));
+
+        conversations.push(convCount || 0);
+      }
+
+      setChartData({ messages, conversations, labels });
+    } catch (error) {
+      console.error("Error loading chart data:", error);
     }
   };
 
@@ -180,6 +225,9 @@ const Dashboard = () => {
               </Card>
             ))}
           </div>
+
+          {/* Charts */}
+          <DashboardCharts data={chartData} />
 
           {/* Quick Actions */}
           <div>
