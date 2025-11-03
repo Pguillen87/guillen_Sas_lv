@@ -169,7 +169,7 @@ export const adminApi = {
 
     // Prevent removing last super_admin
     if (role !== "super_admin") {
-      const { data: userToUpdate } = await adminService.getAllUsers({ role: "super_admin" });
+      const userToUpdate = await adminService.getAllUsers({ role: "super_admin" });
       if (userToUpdate && userToUpdate.length === 1 && userToUpdate[0].id === userId) {
         throw new Error("Cannot remove the last super admin");
       }

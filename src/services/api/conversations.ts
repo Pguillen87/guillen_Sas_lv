@@ -50,7 +50,7 @@ export const conversationsApi = {
   /**
    * Create conversation
    */
-  async create(conversation: Omit<ConversationInsert, "organization_id">) {
+  async create(agentId: string, phoneNumber: string, contactName?: string) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -61,10 +61,18 @@ export const conversationsApi = {
       throw new Error("User has no organization");
     }
 
-    return conversationService.create({
-      ...conversation,
-      organization_id: membership.organization_id,
-    });
+    const { data: conversation, error: convError } = await supabase
+      .from("conversations")
+      .insert({
+        agent_id: agentId,
+        whatsapp_number: phoneNumber,
+        contact_name: contactName,
+      })
+      .select()
+      .single();
+
+    if (convError) throw convError;
+    return conversation;
   },
 
   /**

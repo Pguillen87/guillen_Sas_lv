@@ -178,7 +178,7 @@ export const adminService = {
         .select("*", { count: "exact", head: true })
         .in("agent_id", agentIds);
 
-      const { count: today } = await supabase
+      const { count: todayCount } = await supabase
         .from("messages")
         .select("*", { count: "exact", head: true })
         .in("agent_id", agentIds)
@@ -191,20 +191,20 @@ export const adminService = {
         .gte("sent_at", firstDayOfMonth.toISOString());
 
       totalMessages = total || 0;
-      messagesToday = today || 0;
+      messagesToday = todayCount || 0;
       messagesThisMonth = thisMonth || 0;
     }
 
-    // Count conversations
+    // Count conversations (no organization_id in conversations table)
     const { count: totalConversations } = await supabase
       .from("conversations")
       .select("*", { count: "exact", head: true })
-      .eq("organization_id", organizationId);
+      .in("agent_id", agentIds);
 
     const { count: activeConversations } = await supabase
       .from("conversations")
       .select("*", { count: "exact", head: true })
-      .eq("organization_id", organizationId)
+      .in("agent_id", agentIds)
       .eq("status", "active");
 
     // Count appointments
@@ -217,14 +217,14 @@ export const adminService = {
         .select("*", { count: "exact", head: true })
         .in("agent_id", agentIds);
 
-      const { count: today } = await supabase
+      const { count: todayCount } = await supabase
         .from("appointments")
         .select("*", { count: "exact", head: true })
         .in("agent_id", agentIds)
         .gte("start_time", today.toISOString());
 
       totalAppointments = total || 0;
-      appointmentsToday = today || 0;
+      appointmentsToday = todayCount || 0;
     }
 
     // Get last activity
@@ -328,65 +328,73 @@ export const adminService = {
     const now = new Date();
     const today = new Date(now);
     today.setHours(0, 0, 0, 0);
+    const todayISO = today.toISOString();
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const firstDayISO = firstDayOfMonth.toISOString();
 
-    // Helper function to safely execute queries
-    const safeQuery = async (
-      queryFn: () => Promise<{ count: number | null; error: any }>,
-      defaultValue: number = 0
-    ): Promise<number> => {
-      try {
-        const result = await queryFn();
-        if (result.error) {
-          console.error("Query error:", result.error);
-          return defaultValue;
-        }
-        return result.count || defaultValue;
-      } catch (err) {
-        console.error("Query exception:", err);
-        return defaultValue;
-      }
-    };
+    // Execute all queries and handle errors individually
+    const { count: totalOrganizations } = await supabase
+      .from("organizations")
+      .select("*", { count: "exact", head: true });
 
-    // Execute all queries in parallel with error handling
-    const [
-      totalOrganizations,
-      activeOrganizations,
-      totalAgents,
-      activeAgents,
-      totalMessages,
-      messagesToday,
-      messagesThisMonth,
-      activeConversations,
-      totalUsers,
-      totalAppointments,
-      appointmentsToday,
-    ] = await Promise.all([
-      safeQuery(() => supabase.from("organizations").select("*", { count: "exact", head: true })),
-      safeQuery(() => supabase.from("organizations").select("*", { count: "exact", head: true }).eq("status", "active")),
-      safeQuery(() => supabase.from("agents").select("*", { count: "exact", head: true })),
-      safeQuery(() => supabase.from("agents").select("*", { count: "exact", head: true }).eq("is_active", true)),
-      safeQuery(() => supabase.from("messages").select("*", { count: "exact", head: true })),
-      safeQuery(() => supabase.from("messages").select("*", { count: "exact", head: true }).gte("sent_at", today.toISOString())),
-      safeQuery(() => supabase.from("messages").select("*", { count: "exact", head: true }).gte("sent_at", firstDayOfMonth.toISOString())),
-      safeQuery(() => supabase.from("conversations").select("*", { count: "exact", head: true }).eq("status", "active")),
-      safeQuery(() => supabase.from("users").select("*", { count: "exact", head: true })),
-      safeQuery(() => supabase.from("appointments").select("*", { count: "exact", head: true })),
-      safeQuery(() => supabase.from("appointments").select("*", { count: "exact", head: true }).gte("start_time", today.toISOString())),
-    ]);
+    const { count: activeOrganizations } = await supabase
+      .from("organizations")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "active");
+
+    const { count: totalAgents } = await supabase
+      .from("agents")
+      .select("*", { count: "exact", head: true });
+
+    const { count: activeAgents } = await supabase
+      .from("agents")
+      .select("*", { count: "exact", head: true })
+      .eq("is_active", true);
+
+    const { count: totalMessages } = await supabase
+      .from("messages")
+      .select("*", { count: "exact", head: true });
+
+    const { count: messagesToday } = await supabase
+      .from("messages")
+      .select("*", { count: "exact", head: true })
+      .gte("sent_at", todayISO);
+
+    const { count: messagesThisMonth } = await supabase
+      .from("messages")
+      .select("*", { count: "exact", head: true })
+      .gte("sent_at", firstDayISO);
+
+    const { count: activeConversations } = await supabase
+      .from("conversations")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "active");
+
+    const { count: totalUsers } = await supabase
+      .from("users")
+      .select("*", { count: "exact", head: true });
+
+    const { count: totalAppointments } = await supabase
+      .from("appointments")
+      .select("*", { count: "exact", head: true });
+
+    const { count: appointmentsToday } = await supabase
+      .from("appointments")
+      .select("*", { count: "exact", head: true })
+      .gte("start_time", todayISO);
 
     return {
-      totalOrganizations,
-      activeOrganizations,
-      totalAgents,
-      activeAgents,
-      totalMessages,
-      messagesToday,
-      messagesThisMonth,
-      activeConversations,
-      totalUsers,
-      totalAppointments,
-      appointmentsToday,
+      totalOrganizations: totalOrganizations || 0,
+      activeOrganizations: activeOrganizations || 0,
+      totalAgents: totalAgents || 0,
+      activeAgents: activeAgents || 0,
+      totalMessages: totalMessages || 0,
+      messagesToday: messagesToday || 0,
+      messagesThisMonth: messagesThisMonth || 0,
+      activeConversations: activeConversations || 0,
+      totalUsers: totalUsers || 0,
+      totalAppointments: totalAppointments || 0,
+      appointmentsToday: appointmentsToday || 0,
     };
   },
 

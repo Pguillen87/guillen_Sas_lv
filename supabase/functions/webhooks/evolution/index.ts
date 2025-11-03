@@ -1,7 +1,12 @@
 // Evolution API Webhook Handler
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { supabase } from "../shared/supabase.ts";
-import type { EvolutionWebhookPayload } from "../shared/types.ts";
+import { supabase } from "../../shared/supabase.ts";
+
+interface EvolutionWebhookPayload {
+  event: string;
+  instance: string;
+  data: any;
+}
 
 serve(async (req) => {
   try {
@@ -78,7 +83,7 @@ serve(async (req) => {
       .from("conversations")
       .select("id")
       .eq("agent_id", connection.agent_id)
-      .eq("participant_phone", phoneNumber)
+      .eq("whatsapp_number", phoneNumber)
       .eq("status", "active")
       .maybeSingle();
 
@@ -90,9 +95,8 @@ serve(async (req) => {
         .from("conversations")
         .insert({
           agent_id: connection.agent_id,
-          organization_id: agent.organization_id,
-          participant_phone: phoneNumber,
-          participant_name: data.pushName || null,
+          whatsapp_number: phoneNumber,
+          contact_name: data.pushName || null,
           status: "active",
         })
         .select("id")
@@ -136,7 +140,8 @@ serve(async (req) => {
 
   } catch (error) {
     console.error("Webhook error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
