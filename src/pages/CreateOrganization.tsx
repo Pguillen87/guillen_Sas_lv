@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Building2, Loader2, Sparkles } from "lucide-react";
+import { UniverseBackground } from "@/components/universe/UniverseBackground";
 
 const CreateOrganization = () => {
   const navigate = useNavigate();
@@ -71,20 +72,22 @@ const CreateOrganization = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <Sparkles className="h-8 w-8 text-primary animate-float" />
-            <h1 className="text-4xl font-bold gradient-text">GuillenIA</h1>
+    <div className="fixed inset-0 w-full h-full overflow-hidden" style={{ height: '100vh', maxHeight: '100vh' }}>
+      <UniverseBackground variant="deep" intensity="medium" showNebula={true} />
+      <div className="absolute inset-0 w-full h-full flex items-center justify-center p-4 sm:p-6">
+        <div className="w-full max-w-md space-y-6 relative z-10">
+        <div className="text-center space-y-2 mb-4">
+          <div className="inline-flex items-center gap-2 mb-2">
+            <Sparkles className="h-7 w-7 text-primary animate-float" />
+            <h1 className="text-3xl font-bold gradient-text">GuillenIA</h1>
           </div>
-          <p className="text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Crie sua primeira organização para começar
           </p>
         </div>
 
-        <Card className="glass p-8 shadow-elevated">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <Card className="glass p-6 shadow-elevated">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Nome da Organização *</Label>
               <Input
@@ -94,6 +97,8 @@ const CreateOrganization = () => {
                 onChange={(e) => handleSlugChange(e.target.value)}
                 required
                 disabled={loading}
+                autoComplete="organization"
+                autoFocus
               />
             </div>
 
@@ -108,6 +113,7 @@ const CreateOrganization = () => {
                 }
                 required
                 disabled={loading}
+                autoComplete="off"
               />
               <p className="text-xs text-muted-foreground">
                 Usado para identificar sua organização na URL
@@ -133,6 +139,7 @@ const CreateOrganization = () => {
             </Button>
           </form>
         </Card>
+        </div>
       </div>
     </div>
   );

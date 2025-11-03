@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { UniverseBackground } from "@/components/universe/UniverseBackground";
 import {
   Bot,
   LayoutDashboard,
@@ -67,7 +68,8 @@ const Layout = ({ children }: LayoutProps) => {
   ];
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex relative">
+      <UniverseBackground variant="default" intensity="low" showNebula={true} />
       {/* Mobile Menu Button */}
       <button
         className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-card rounded-lg shadow-card"
@@ -151,7 +153,7 @@ const Layout = ({ children }: LayoutProps) => {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">{children}</main>
+      <main className="flex-1 overflow-auto relative z-10">{children}</main>
     </div>
   );
 };

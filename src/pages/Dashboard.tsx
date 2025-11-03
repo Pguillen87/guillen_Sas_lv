@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import {
@@ -12,150 +11,83 @@ import {
   Plus,
   Sparkles,
 } from "lucide-react";
-import Layout from "@/components/Layout";
+import Layout from "@/components/layout/Layout";
+import { ClientRoute } from "@/components/routes/ClientRoute";
 import DashboardCharts from "@/components/DashboardCharts";
-import { subDays, format } from "date-fns";
+import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { dashboardApi } from "@/services/api/dashboard";
+import { useQuery } from "@tanstack/react-query";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    activeAgents: 0,
-    messagesToday: 0,
-    activeConversations: 0,
-    appointmentsToday: 0,
+
+  const {
+    data: stats,
+    isLoading: statsLoading,
+    error: statsError,
+  } = useQuery({
+    queryKey: ["dashboard", "stats"],
+    queryFn: () => dashboardApi.getStats(),
   });
 
-  const [chartData, setChartData] = useState({
-    messages: [0, 0, 0, 0, 0, 0, 0],
-    conversations: [0, 0, 0, 0, 0, 0, 0],
-    labels: [] as string[],
+  const {
+    data: chartDataPoints,
+    isLoading: chartLoading,
+  } = useQuery({
+    queryKey: ["dashboard", "chart"],
+    queryFn: () => dashboardApi.getChartData(7),
   });
+
+  // Transform chart data for DashboardCharts component
+  const chartData = chartDataPoints
+    ? {
+        messages: chartDataPoints.map((point) => point.messages),
+        conversations: chartDataPoints.map((point) => point.conversations),
+        labels: chartDataPoints.map((point) => {
+          const date = new Date(point.date);
+          return format(date, "EEE", { locale: ptBR });
+        }),
+      }
+    : {
+        messages: [0, 0, 0, 0, 0, 0, 0],
+        conversations: [0, 0, 0, 0, 0, 0, 0],
+        labels: [] as string[],
+      };
+
+  const loading = statsLoading || chartLoading;
 
   useEffect(() => {
-    checkAuth();
-    loadStats();
-    loadChartData();
-  }, []);
-
-  const checkAuth = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/login");
+    if (statsError) {
+      toast.error("Erro ao carregar estatísticas. Tente recarregar a página.");
     }
-  };
-
-  const loadStats = async () => {
-    try {
-      // Load active agents
-      const { count: agentsCount } = await supabase
-        .from("agents")
-        .select("*", { count: "exact", head: true })
-        .eq("is_active", true);
-
-      // Load messages today
-      const today = new Date().toISOString().split("T")[0];
-      const { count: messagesCount } = await supabase
-        .from("messages")
-        .select("*", { count: "exact", head: true })
-        .gte("sent_at", today);
-
-      // Load active conversations
-      const { count: conversationsCount } = await supabase
-        .from("conversations")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "active");
-
-      // Load appointments today
-      const { count: appointmentsCount } = await supabase
-        .from("appointments")
-        .select("*", { count: "exact", head: true })
-        .gte("start_time", today)
-        .eq("status", "scheduled");
-
-      setStats({
-        activeAgents: agentsCount || 0,
-        messagesToday: messagesCount || 0,
-        activeConversations: conversationsCount || 0,
-        appointmentsToday: appointmentsCount || 0,
-      });
-    } catch (error) {
-      console.error("Error loading stats:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadChartData = async () => {
-    try {
-      const labels: string[] = [];
-      const messages: number[] = [];
-      const conversations: number[] = [];
-
-      for (let i = 6; i >= 0; i--) {
-        const date = subDays(new Date(), i);
-        const dateStr = format(date, "yyyy-MM-dd");
-        labels.push(format(date, "EEE", { locale: ptBR }));
-
-        // Count messages
-        const { count: msgCount } = await supabase
-          .from("messages")
-          .select("*", { count: "exact", head: true })
-          .gte("sent_at", dateStr)
-          .lt("sent_at", format(subDays(date, -1), "yyyy-MM-dd"));
-
-        messages.push(msgCount || 0);
-
-        // Count conversations
-        const { count: convCount } = await supabase
-          .from("conversations")
-          .select("*", { count: "exact", head: true })
-          .gte("created_at", dateStr)
-          .lt("created_at", format(subDays(date, -1), "yyyy-MM-dd"));
-
-        conversations.push(convCount || 0);
-      }
-
-      setChartData({ messages, conversations, labels });
-    } catch (error) {
-      console.error("Error loading chart data:", error);
-    }
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/login");
-    toast.success("Logout realizado com sucesso");
-  };
+  }, [statsError]);
 
   const statCards = [
     {
       title: "Agentes Ativos",
-      value: stats.activeAgents,
+      value: stats?.activeAgents || 0,
       icon: Bot,
       color: "text-primary",
       bgColor: "bg-primary/10",
     },
     {
       title: "Mensagens Hoje",
-      value: stats.messagesToday,
+      value: stats?.messagesToday || 0,
       icon: MessageSquare,
       color: "text-accent",
       bgColor: "bg-accent/10",
     },
     {
       title: "Conversas Ativas",
-      value: stats.activeConversations,
+      value: stats?.activeConversations || 0,
       icon: Users,
       color: "text-success",
       bgColor: "bg-success/10",
     },
     {
       title: "Agendamentos Hoje",
-      value: stats.appointmentsToday,
+      value: stats?.appointmentsToday || 0,
       icon: Calendar,
       color: "text-blue-400",
       bgColor: "bg-blue-400/10",
@@ -190,9 +122,10 @@ const Dashboard = () => {
   ];
 
   return (
-    <Layout>
-      <div className="p-4 md:p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
+    <ClientRoute>
+      <Layout>
+        <div className="p-4 sm:p-6 lg:p-8 w-full">
+        <div className="w-full space-y-6 sm:space-y-8">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -207,24 +140,43 @@ const Dashboard = () => {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {statCards.map((stat, index) => (
-              <Card
-                key={index}
-                className="glass p-6 shadow-card hover:shadow-glow transition-all duration-300"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">{stat.title}</p>
-                    <p className="text-3xl font-bold mt-2">{stat.value}</p>
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <Card
+                  key={i}
+                  className="glass p-6 shadow-card animate-pulse"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="h-4 bg-muted rounded w-24 mb-2"></div>
+                      <div className="h-8 bg-muted rounded w-16"></div>
+                    </div>
+                    <div className="w-12 h-12 bg-muted rounded-xl"></div>
                   </div>
-                  <div className={`p-3 rounded-xl ${stat.bgColor}`}>
-                    <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {statCards.map((stat, index) => (
+                <Card
+                  key={index}
+                  className="glass p-6 shadow-card hover:shadow-glow transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">{stat.title}</p>
+                      <p className="text-3xl font-bold mt-2">{stat.value}</p>
+                    </div>
+                    <div className={`p-3 rounded-xl ${stat.bgColor}`}>
+                      <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+                </Card>
+              ))}
+            </div>
+          )}
 
           {/* Charts */}
           <DashboardCharts data={chartData} />
@@ -256,7 +208,8 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-    </Layout>
+      </Layout>
+    </ClientRoute>
   );
 };
 

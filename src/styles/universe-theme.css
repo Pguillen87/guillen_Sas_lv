@@ -1,0 +1,422 @@
+/**
+ * Tema Visual - Universo
+ * Fundo de universo com detalhes dourados e luzes roxas
+ */
+
+/* Variáveis CSS para o tema universo */
+:root {
+  /* Cores do universo */
+  --universe-deep-black: hsl(240, 15%, 3%);
+  --universe-dark-blue: hsl(240, 30%, 8%);
+  --universe-space-blue: hsl(240, 40%, 12%);
+  
+  /* Cores douradas */
+  --gold-primary: hsl(45, 90%, 60%);
+  --gold-bright: hsl(45, 95%, 70%);
+  --gold-dim: hsl(45, 70%, 45%);
+  --gold-glow: hsl(45, 90%, 60%, 0.6);
+  
+  /* Cores roxas */
+  --purple-primary: hsl(270, 70%, 60%);
+  --purple-bright: hsl(270, 80%, 70%);
+  --purple-dim: hsl(270, 60%, 50%);
+  --purple-glow: hsl(270, 70%, 60%, 0.5);
+  
+  /* Nebulosa colors */
+  --nebula-purple: hsl(270, 60%, 30%);
+  --nebula-blue: hsl(240, 50%, 25%);
+  --nebula-gold: hsl(45, 60%, 35%);
+}
+
+@layer utilities {
+  /* Fundo base do universo */
+  .universe-bg {
+    background: 
+      radial-gradient(ellipse at top, var(--nebula-purple) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, var(--nebula-blue) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom left, var(--nebula-gold) 0%, transparent 50%),
+      radial-gradient(circle at 20% 30%, var(--purple-glow) 0%, transparent 30%),
+      radial-gradient(circle at 80% 70%, var(--gold-glow) 0%, transparent 30%),
+      linear-gradient(180deg, var(--universe-deep-black) 0%, var(--universe-dark-blue) 50%, var(--universe-deep-black) 100%);
+    background-attachment: fixed;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+  }
+
+  .universe-bg::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      radial-gradient(2px 2px at 20% 30%, white, transparent),
+      radial-gradient(2px 2px at 60% 70%, white, transparent),
+      radial-gradient(1px 1px at 50% 50%, white, transparent),
+      radial-gradient(1px 1px at 80% 10%, white, transparent),
+      radial-gradient(2px 2px at 90% 40%, white, transparent),
+      radial-gradient(1px 1px at 33% 60%, white, transparent),
+      radial-gradient(2px 2px at 10% 90%, white, transparent),
+      radial-gradient(1px 1px at 70% 80%, white, transparent),
+      radial-gradient(2px 2px at 40% 10%, white, transparent),
+      radial-gradient(1px 1px at 25% 50%, white, transparent);
+    background-repeat: repeat;
+    background-size: 200% 200%;
+    animation: starfield 200s linear infinite;
+    opacity: 0.6;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes starfield {
+    0% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  /* Animação de brilho dourado */
+  @keyframes gold-glow {
+    0%, 100% {
+      box-shadow: 
+        0 0 10px var(--gold-glow),
+        0 0 20px var(--gold-glow),
+        0 0 30px var(--gold-primary);
+    }
+    50% {
+      box-shadow: 
+        0 0 20px var(--gold-glow),
+        0 0 40px var(--gold-glow),
+        0 0 60px var(--gold-primary);
+    }
+  }
+
+  /* Animação de luz roxa pulsante */
+  @keyframes purple-pulse {
+    0%, 100% {
+      opacity: 0.4;
+      filter: blur(2px);
+    }
+    50% {
+      opacity: 0.8;
+      filter: blur(4px);
+    }
+  }
+
+  /* Animação de partículas flutuantes */
+  @keyframes float-particles {
+    0% {
+      transform: translateY(0) translateX(0) scale(1);
+      opacity: 0.3;
+    }
+    33% {
+      transform: translateY(-30px) translateX(20px) scale(1.2);
+      opacity: 0.6;
+    }
+    66% {
+      transform: translateY(-60px) translateX(-20px) scale(0.8);
+      opacity: 0.4;
+    }
+    100% {
+      transform: translateY(-90px) translateX(0) scale(1);
+      opacity: 0.2;
+    }
+  }
+
+  /* Animação de constelações (linhas conectando) */
+  @keyframes constellation {
+    0%, 100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  /* Efeitos de brilho */
+  .golden-glow {
+    box-shadow: 
+      0 0 10px var(--gold-glow),
+      0 0 20px var(--gold-glow),
+      inset 0 0 10px var(--gold-glow);
+    animation: gold-glow 3s ease-in-out infinite;
+  }
+
+  .purple-glow {
+    box-shadow: 
+      0 0 10px var(--purple-glow),
+      0 0 20px var(--purple-glow);
+    animation: purple-pulse 2s ease-in-out infinite;
+  }
+
+  /* Estrelas animadas */
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+
+  .star.gold {
+    background: var(--gold-primary);
+    box-shadow: 0 0 6px var(--gold-glow);
+  }
+
+  .star.purple {
+    background: var(--purple-primary);
+    box-shadow: 0 0 6px var(--purple-glow);
+  }
+
+  /* Estrelas animadas inspiradas no JWST */
+  .jwst-star {
+    position: absolute;
+    border-radius: 50%;
+    animation: jwst-twinkle 4s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .jwst-star.star-white {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 
+      0 0 2px rgba(255, 255, 255, 0.8),
+      0 0 4px rgba(255, 255, 255, 0.4);
+  }
+
+  .jwst-star.star-gold {
+    background: var(--gold-primary);
+    box-shadow: 
+      0 0 3px var(--gold-primary),
+      0 0 6px var(--gold-glow),
+      0 0 10px rgba(251, 191, 36, 0.3);
+  }
+
+  .jwst-star.star-blue {
+    background: hsl(200, 80%, 70%);
+    box-shadow: 
+      0 0 3px hsl(200, 80%, 70%),
+      0 0 6px hsl(200, 70%, 60%),
+      0 0 10px rgba(96, 165, 250, 0.3);
+  }
+
+  /* Estrelas brilhantes especiais */
+  .jwst-star-bright {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--gold-bright);
+    box-shadow: 
+      0 0 4px var(--gold-bright),
+      0 0 8px var(--gold-glow),
+      0 0 16px rgba(251, 191, 36, 0.5),
+      0 0 24px rgba(251, 191, 36, 0.3);
+    animation: jwst-star-pulse 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  /* Nebulosas inspiradas no JWST - discretas mas belas */
+  .jwst-nebula {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.25;
+    animation: jwst-nebula-drift 60s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .jwst-nebula-gold {
+    background: radial-gradient(
+      circle,
+      hsl(45, 85%, 65%) 0%,
+      hsl(45, 70%, 50%) 30%,
+      hsl(30, 60%, 40%) 50%,
+      transparent 70%
+    );
+  }
+
+  .jwst-nebula-blue {
+    background: radial-gradient(
+      circle,
+      hsl(210, 70%, 60%) 0%,
+      hsl(220, 60%, 45%) 30%,
+      hsl(240, 50%, 30%) 50%,
+      transparent 70%
+    );
+  }
+
+  .jwst-nebula-purple {
+    background: radial-gradient(
+      circle,
+      hsl(280, 60%, 55%) 0%,
+      hsl(270, 50%, 40%) 30%,
+      hsl(260, 40%, 30%) 50%,
+      transparent 70%
+    );
+  }
+
+  .jwst-nebula-gold-subtle {
+    background: radial-gradient(
+      circle,
+      hsl(45, 70%, 55%) 0%,
+      hsl(40, 60%, 40%) 40%,
+      transparent 70%
+    );
+    opacity: 0.15;
+  }
+
+  /* Animação de brilho suave para estrelas JWST */
+  @keyframes jwst-twinkle {
+    0%, 100% {
+      opacity: 0.4;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+  }
+
+  /* Animação de pulso para estrelas brilhantes */
+  @keyframes jwst-star-pulse {
+    0%, 100% {
+      opacity: 0.7;
+      transform: scale(1);
+      box-shadow: 
+        0 0 4px var(--gold-bright),
+        0 0 8px var(--gold-glow),
+        0 0 16px rgba(251, 191, 36, 0.5),
+        0 0 24px rgba(251, 191, 36, 0.3);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.2);
+      box-shadow: 
+        0 0 6px var(--gold-bright),
+        0 0 12px var(--gold-glow),
+        0 0 24px rgba(251, 191, 36, 0.7),
+        0 0 36px rgba(251, 191, 36, 0.4);
+    }
+  }
+
+  /* Animação de movimento suave para nebulosas */
+  @keyframes jwst-nebula-drift {
+    0%, 100% {
+      transform: translate(0, 0) scale(1);
+      opacity: 0.25;
+    }
+    33% {
+      transform: translate(30px, -40px) scale(1.1);
+      opacity: 0.3;
+    }
+    66% {
+      transform: translate(-20px, 30px) scale(0.9);
+      opacity: 0.2;
+    }
+  }
+
+  /* Partículas douradas */
+  .golden-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--gold-primary);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--gold-glow);
+    animation: float-particles 8s ease-in-out infinite;
+  }
+
+  /* Nebulosa animada */
+  .nebula-effect {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, var(--purple-glow) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(60px);
+    animation: nebula-drift 30s ease-in-out infinite;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  @keyframes nebula-drift {
+    0%, 100% {
+      transform: translate(0, 0) scale(1);
+    }
+    33% {
+      transform: translate(50px, -50px) scale(1.2);
+    }
+    66% {
+      transform: translate(-50px, 50px) scale(0.8);
+    }
+  }
+
+  /* Gradientes universo */
+  .universe-gradient-primary {
+    background: linear-gradient(
+      135deg,
+      var(--purple-primary) 0%,
+      var(--gold-primary) 50%,
+      var(--purple-primary) 100%
+    );
+  }
+
+  .universe-gradient-text {
+    background: linear-gradient(
+      135deg,
+      var(--gold-bright) 0%,
+      var(--purple-bright) 50%,
+      var(--gold-bright) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-shift 3s linear infinite;
+  }
+
+  @keyframes gradient-shift {
+    to {
+      background-position: 200% center;
+    }
+  }
+
+  /* Bordas brilhantes */
+  .universe-border {
+    border: 1px solid transparent;
+    background: linear-gradient(var(--universe-space-blue), var(--universe-space-blue)) padding-box,
+                linear-gradient(135deg, var(--purple-primary), var(--gold-primary)) border-box;
+    position: relative;
+  }
+
+  .universe-border::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(135deg, var(--purple-primary), var(--gold-primary));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.6;
+    animation: border-glow 3s ease-in-out infinite;
+  }
+
+  @keyframes border-glow {
+    0%, 100% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+}
+

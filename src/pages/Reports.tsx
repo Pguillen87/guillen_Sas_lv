@@ -10,6 +10,8 @@ import {
   Calendar,
   Download,
 } from "lucide-react";
+import Layout from "@/components/layout/Layout";
+import { ClientRoute } from "@/components/routes/ClientRoute";
 
 const Reports = () => {
   const [loading, setLoading] = useState(true);
@@ -75,8 +77,10 @@ const Reports = () => {
   ];
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <ClientRoute>
+      <Layout>
+        <div className="p-4 sm:p-6 lg:p-8 w-full">
+          <div className="w-full space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
@@ -141,8 +145,10 @@ const Reports = () => {
             </div>
           </div>
         </Card>
-      </div>
-    </div>
+          </div>
+        </div>
+      </Layout>
+    </ClientRoute>
   );
 };
 

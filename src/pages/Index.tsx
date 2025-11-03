@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Bot, Zap, Shield, TrendingUp } from "lucide-react";
+import { UniverseBackground } from "@/components/universe/UniverseBackground";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -29,10 +30,11 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
+      <UniverseBackground variant="expansive" intensity="high" showNebula={true} />
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <div className="relative overflow-hidden z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
           <div className="text-center space-y-8">
             <div className="inline-flex items-center gap-3 mb-6">
               <Sparkles className="h-12 w-12 text-primary animate-float" />
@@ -67,7 +69,7 @@ const Index = () => {
       </div>
 
       {/* Features Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 relative z-10">
         <h2 className="text-3xl font-bold text-center mb-12">
           Tudo que você precisa para{" "}
           <span className="gradient-text">automatizar seu atendimento</span>
@@ -90,7 +92,7 @@ const Index = () => {
       </div>
 
       {/* CTA Section */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 text-center relative z-10">
         <div className="glass p-12 rounded-2xl shadow-elevated">
           <h2 className="text-3xl font-bold mb-4">
             Pronto para transformar seu atendimento?

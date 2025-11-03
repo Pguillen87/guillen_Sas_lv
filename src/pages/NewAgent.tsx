@@ -1,20 +1,22 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
 import { Bot, Loader2, ArrowLeft } from "lucide-react";
-import Layout from "@/components/Layout";
+import Layout from "@/components/layout/Layout";
+import { ClientRoute } from "@/components/routes/ClientRoute";
+import { useCreateAgent } from "@/hooks/agents/useAgents";
+import { createAgentSchema } from "@/lib/validations";
+import type { CreateAgentFormData } from "@/types";
 
 const NewAgent = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const createAgent = useCreateAgent();
+  const [formData, setFormData] = useState<CreateAgentFormData>({
     name: "",
     description: "",
     customPrompt: "",
@@ -29,72 +31,42 @@ const NewAgent = () => {
       setFormData({
         name: template.name,
         description: template.description,
-        customPrompt: template.prompt,
+        customPrompt: template.prompt || template.base_prompt,
         temperature: 0.7,
         maxTokens: 1000,
+        templateId: template.id,
       });
     }
   }, [location]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    try {
-      // Get user's first organization
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("Usuário não autenticado");
-
-      const { data: membership } = await supabase
-        .from("organization_members")
-        .select("organization_id")
-        .eq("user_id", user.id)
-        .single();
-
-      if (!membership) throw new Error("Organização não encontrada");
-
-      // Create agent
-      const { data: agent, error: agentError } = await supabase
-        .from("agents")
-        .insert({
-          name: formData.name,
-          description: formData.description,
-          organization_id: membership.organization_id,
-          is_active: false,
-        })
-        .select()
-        .single();
-
-      if (agentError) throw agentError;
-
-      // Create agent configuration
-      const { error: configError } = await supabase
-        .from("agent_configurations")
-        .insert({
-          agent_id: agent.id,
-          custom_prompt: formData.customPrompt,
-          temperature: formData.temperature,
-          max_tokens: formData.maxTokens,
-        });
-
-      if (configError) throw configError;
-
-      toast.success("Agente criado com sucesso!");
-      navigate("/agents");
-    } catch (error: any) {
-      toast.error(error.message || "Erro ao criar agente");
-      console.error(error);
-    } finally {
-      setLoading(false);
+    
+    // Validate form data
+    const validationResult = createAgentSchema.safeParse(formData);
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
+      // Error will be shown by toast in the mutation
+      return;
     }
+
+    createAgent.mutate(formData, {
+      onSuccess: () => {
+        navigate("/agents");
+      },
+      onError: (error: any) => {
+        if (error.message?.includes("organização")) {
+          navigate("/create-organization");
+        }
+      },
+    });
   };
 
   return (
-    <Layout>
-      <div className="p-4 md:p-8">
-        <div className="max-w-3xl mx-auto space-y-8">
+    <ClientRoute>
+      <Layout>
+        <div className="p-4 sm:p-6 lg:p-8 w-full">
+          <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8">
           {/* Header */}
           <div>
             <Button
@@ -124,7 +96,7 @@ const NewAgent = () => {
                     setFormData({ ...formData, name: e.target.value })
                   }
                   required
-                  disabled={loading}
+                  disabled={createAgent.isPending}
                 />
               </div>
 
@@ -138,7 +110,7 @@ const NewAgent = () => {
                     setFormData({ ...formData, description: e.target.value })
                   }
                   rows={3}
-                  disabled={loading}
+                  disabled={createAgent.isPending}
                 />
               </div>
 
@@ -152,7 +124,7 @@ const NewAgent = () => {
                     setFormData({ ...formData, customPrompt: e.target.value })
                   }
                   rows={6}
-                  disabled={loading}
+                  disabled={createAgent.isPending}
                 />
                 <p className="text-sm text-muted-foreground">
                   Defina o comportamento e personalidade do seu agente
@@ -177,7 +149,7 @@ const NewAgent = () => {
                         temperature: parseFloat(e.target.value),
                       })
                     }
-                    disabled={loading}
+                    disabled={createAgent.isPending}
                   />
                   <p className="text-xs text-muted-foreground">
                     Controla a criatividade das respostas (0 = preciso, 1 = criativo)
@@ -198,7 +170,7 @@ const NewAgent = () => {
                         maxTokens: parseInt(e.target.value),
                       })
                     }
-                    disabled={loading}
+                    disabled={createAgent.isPending}
                   />
                   <p className="text-xs text-muted-foreground">
                     Tamanho máximo das respostas
@@ -212,16 +184,16 @@ const NewAgent = () => {
                   variant="outline"
                   className="flex-1"
                   onClick={() => navigate("/agents")}
-                  disabled={loading}
+                  disabled={createAgent.isPending}
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="submit"
                   className="flex-1 bg-gradient-primary hover:opacity-90"
-                  disabled={loading}
+                  disabled={createAgent.isPending}
                 >
-                  {loading ? (
+                  {createAgent.isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Criando...
@@ -238,7 +210,8 @@ const NewAgent = () => {
           </Card>
         </div>
       </div>
-    </Layout>
+      </Layout>
+    </ClientRoute>
   );
 };
 

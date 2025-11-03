@@ -1,0 +1,18 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:8080",
+  "loginUser": "pguillen551@gmail.com",
+  "loginPassword": "123456789",
+  "executionArgs": {
+    "projectName": "guillen_Sas_lv",
+    "projectPath": "C:\\app\\guillen_Sas_lv",
+    "testIds": [],
+    "additionalInstruction": "",
+    "envs": {
+      "API_KEY": "sk-user-bf9iFixczyNlGgkhCz39nhvalmgjTAcbBT6kzzqI4NOeD0pJRL_fVdOT-frsGJtso3CPlyC3vPBg8E7L_sOvFQehgccvnKjg3ziuOltED2vmTSJlV1ev2g0rlvh-Fu_OeH0"
+    }
+  },
+  "proxy": "http://4474fba2-3cb8-4c2b-8f41-284c486965f6:BowazslQascKcYNaYnyu70QvBGDkvZK7@tun.testsprite.com:8080"
+}

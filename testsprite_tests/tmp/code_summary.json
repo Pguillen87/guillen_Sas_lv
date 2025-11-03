@@ -1,0 +1,104 @@
+{
+  "project_name": "GuillenIA",
+  "description": "Plataforma completa para criação e gestão de agentes de IA conversacionais integrados ao WhatsApp",
+  "tech_stack": {
+    "frontend": {
+      "framework": "React 18",
+      "build_tool": "Vite",
+      "language": "TypeScript",
+      "styling": "Tailwind CSS",
+      "ui_library": "shadcn/ui (Radix UI components)",
+      "routing": "React Router DOM",
+      "state_management": "React Query (TanStack Query)",
+      "forms": "React Hook Form + Zod",
+      "icons": "Lucide React",
+      "notifications": "Sonner"
+    },
+    "backend": {
+      "database": "Supabase (PostgreSQL)",
+      "authentication": "Supabase Auth",
+      "real_time": "Supabase Realtime"
+    }
+  },
+  "main_features": [
+    {
+      "name": "Autenticação",
+      "description": "Sistema de login e registro com Supabase Auth",
+      "pages": ["/login", "/register"]
+    },
+    {
+      "name": "Dashboard",
+      "description": "Painel principal com estatísticas e gráficos em tempo real",
+      "pages": ["/dashboard"],
+      "includes": ["Estatísticas de agentes ativos", "Mensagens do dia", "Conversas ativas", "Agendamentos", "Gráficos de desempenho"]
+    },
+    {
+      "name": "Gestão de Agentes",
+      "description": "Criação e gerenciamento de agentes de IA",
+      "pages": ["/agents", "/agents/new", "/agents/templates"],
+      "includes": ["Lista de agentes", "Criar novo agente", "Templates de agentes"]
+    },
+    {
+      "name": "Conversas",
+      "description": "Visualização e gerenciamento de conversas dos agentes",
+      "pages": ["/conversations"]
+    },
+    {
+      "name": "Agendamentos",
+      "description": "Gestão de agendamentos",
+      "pages": ["/appointments"]
+    },
+    {
+      "name": "Relatórios",
+      "description": "Geração de relatórios e análises",
+      "pages": ["/reports"]
+    },
+    {
+      "name": "Organização",
+      "description": "Criação e gestão de organizações",
+      "pages": ["/create-organization"]
+    },
+    {
+      "name": "Preços",
+      "description": "Página de planos e preços",
+      "pages": ["/pricing"]
+    },
+    {
+      "name": "Landing Page",
+      "description": "Página inicial com informações sobre a plataforma",
+      "pages": ["/"]
+    }
+  ],
+  "authentication": {
+    "method": "Supabase Auth",
+    "flow": "Email/Password",
+    "protected_routes": ["/dashboard", "/agents", "/conversations", "/appointments", "/reports"],
+    "public_routes": ["/", "/login", "/register", "/pricing"]
+  },
+  "data_integration": {
+    "primary": "Supabase",
+    "features": ["Authentication", "Database", "Real-time subscriptions", "Storage"]
+  },
+  "ui_components": {
+    "library": "shadcn/ui",
+    "components_used": [
+      "Button", "Input", "Label", "Card", "Dialog", "Form", "Table", "Select",
+      "Dropdown", "Toast", "Tabs", "Charts", "Calendar", "Avatar", "Badge"
+    ]
+  },
+  "key_dependencies": {
+    "react": "^18.3.1",
+    "react-router-dom": "^6.30.1",
+    "@tanstack/react-query": "^5.83.0",
+    "@supabase/supabase-js": "^2.78.0",
+    "react-hook-form": "^7.61.1",
+    "zod": "^3.25.76",
+    "recharts": "^2.15.4",
+    "date-fns": "^3.6.0"
+  },
+  "development": {
+    "server_port": 8080,
+    "server_host": "::",
+    "start_command": "npm run dev"
+  }
+}

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Sparkles, Loader2 } from "lucide-react";
+import { UniverseBackground } from "@/components/universe/UniverseBackground";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -56,20 +57,22 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <Sparkles className="h-8 w-8 text-primary animate-float" />
-            <h1 className="text-4xl font-bold gradient-text">GuillenIA</h1>
+    <div className="fixed inset-0 w-full h-full overflow-hidden" style={{ height: '100vh', maxHeight: '100vh' }}>
+      <UniverseBackground variant="deep" intensity="medium" showNebula={true} />
+      <div className="absolute inset-0 w-full h-full flex items-center justify-center p-4 sm:p-6">
+        <div className="w-full max-w-md space-y-6 relative z-10">
+        <div className="text-center space-y-2 mb-4">
+          <div className="inline-flex items-center gap-2 mb-2">
+            <Sparkles className="h-7 w-7 text-primary animate-float" />
+            <h1 className="text-3xl font-bold gradient-text">GuillenIA</h1>
           </div>
-          <p className="text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Crie sua conta e comece a usar agentes de IA
           </p>
         </div>
 
-        <Card className="glass p-8 shadow-elevated">
-          <form onSubmit={handleRegister} className="space-y-6">
+        <Card className="glass p-6 shadow-elevated">
+          <form onSubmit={handleRegister} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="fullName">Nome Completo</Label>
               <Input
@@ -80,6 +83,8 @@ const Register = () => {
                 onChange={(e) => setFullName(e.target.value)}
                 required
                 disabled={loading}
+                autoComplete="name"
+                autoFocus
               />
             </div>
 
@@ -93,6 +98,7 @@ const Register = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                autoComplete="email"
               />
             </div>
 
@@ -106,6 +112,7 @@ const Register = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
+                autoComplete="new-password"
               />
             </div>
 
@@ -119,6 +126,7 @@ const Register = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 disabled={loading}
+                autoComplete="new-password"
               />
             </div>
 
@@ -138,13 +146,14 @@ const Register = () => {
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-muted-foreground">
+          <div className="mt-4 text-center text-sm text-muted-foreground">
             Já tem uma conta?{" "}
             <Link to="/login" className="text-primary hover:underline">
               Faça login
             </Link>
           </div>
         </Card>
+        </div>
       </div>
     </div>
   );

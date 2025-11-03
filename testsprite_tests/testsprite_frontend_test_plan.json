@@ -1,0 +1,556 @@
+[
+  {
+    "id": "TC001",
+    "title": "User Registration with Valid Email and Password",
+    "description": "Verify that a new user can successfully register with a valid email and password, and is redirected to organization creation and plan selection.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the registration page (/register)"
+      },
+      {
+        "type": "action",
+        "description": "Enter valid email and password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm registration success message is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm redirection to organization creation page"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "User Registration with Invalid Email Format",
+    "description": "Verify that registration fails when the user inputs an invalid email format.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the registration page (/register)"
+      },
+      {
+        "type": "action",
+        "description": "Enter an invalid email format and valid password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify error message indicating invalid email format is shown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that user is not redirected"
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "User Login with Correct Credentials",
+    "description": "Verify that a registered user can log in successfully using correct email and password credentials.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page (/login)"
+      },
+      {
+        "type": "action",
+        "description": "Enter valid registered email and corresponding password"
+      },
+      {
+        "type": "action",
+        "description": "Click the login button"
+      },
+      {
+        "type": "assertion",
+        "description": "User is authenticated and redirected to the dashboard (/dashboard)"
+      },
+      {
+        "type": "assertion",
+        "description": "Session is established and persisted"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "User Login with Incorrect Credentials",
+    "description": "Verify that login fails when a user enters incorrect email or password.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page (/login)"
+      },
+      {
+        "type": "action",
+        "description": "Enter incorrect email or password"
+      },
+      {
+        "type": "action",
+        "description": "Click the login button"
+      },
+      {
+        "type": "assertion",
+        "description": "Display relevant error message for invalid credentials"
+      },
+      {
+        "type": "assertion",
+        "description": "User remains on login page"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Agent Creation from Template with All Mandatory Fields Validated",
+    "description": "Verify that an AI agent can be created from a template, all mandatory fields must be validated and error messages shown for missing data.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in and navigate to new agent creation page (/agents/new)"
+      },
+      {
+        "type": "action",
+        "description": "Select a pre-configured agent template"
+      },
+      {
+        "type": "action",
+        "description": "Leave mandatory fields empty and attempt to submit the form"
+      },
+      {
+        "type": "assertion",
+        "description": "Validation errors appear for each missing mandatory field"
+      },
+      {
+        "type": "action",
+        "description": "Fill all mandatory fields properly and submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Agent is created and displayed in the agent list (/agents)"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Agent Creation from Scratch with OpenAI API Integration",
+    "description": "Verify creating a new AI agent from scratch succeeds with OpenAI API integration and configurable AI parameters.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to agent creation page"
+      },
+      {
+        "type": "action",
+        "description": "Select build from scratch option"
+      },
+      {
+        "type": "action",
+        "description": "Enter agent name, description, and customize prompt and AI parameters"
+      },
+      {
+        "type": "action",
+        "description": "Submit the creation form"
+      },
+      {
+        "type": "assertion",
+        "description": "Agent is created in the system and OpenAI API connection is established"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "WhatsApp Connection Test and Agent Activation",
+    "description": "Verify that WhatsApp connection can be tested successfully and agent can be activated after storing encrypted credentials.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Initiate WhatsApp integration configuration for an agent"
+      },
+      {
+        "type": "action",
+        "description": "Enter valid credentials for Evolution API"
+      },
+      {
+        "type": "action",
+        "description": "Click test connection button"
+      },
+      {
+        "type": "assertion",
+        "description": "Connection test passes and confirmation is shown"
+      },
+      {
+        "type": "action",
+        "description": "Activate the agent for message processing"
+      },
+      {
+        "type": "assertion",
+        "description": "Agent state changes to active and ready to process messages"
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Incoming WhatsApp Message Processing and Auto-Response",
+    "description": "Verify that incoming WhatsApp messages received via webhook are processed by matching to correct agent, generating AI response, sending automatic reply, and updating conversation and metrics.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send WhatsApp message to the number linked to a configured agent"
+      },
+      {
+        "type": "assertion",
+        "description": "Webhook receives message payload and associates it with the correct agent and conversation"
+      },
+      {
+        "type": "assertion",
+        "description": "OpenAI generates response based on conversation context"
+      },
+      {
+        "type": "assertion",
+        "description": "System sends automatic reply back through WhatsApp"
+      },
+      {
+        "type": "assertion",
+        "description": "Conversation records and real-time metrics on dashboard update correctly"
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Conversation Interface Message History and Search Functionality",
+    "description": "Verify that the conversation interface displays complete message history, supports searching messages and filtering conversations accurately.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to conversations page (/conversations)"
+      },
+      {
+        "type": "assertion",
+        "description": "Message history is loaded and displayed in WhatsApp style format"
+      },
+      {
+        "type": "action",
+        "description": "Use search to find specific keywords in messages"
+      },
+      {
+        "type": "assertion",
+        "description": "Search results highlight matching messages properly"
+      },
+      {
+        "type": "action",
+        "description": "Apply filter to show only active or archived conversations"
+      },
+      {
+        "type": "assertion",
+        "description": "Only conversations matching the filter are displayed"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Manual Appointment Creation with Validation",
+    "description": "Verify that manual appointment creation requires valid input and provides validation feedback for missing or conflicting data.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the appointments page (/appointments)"
+      },
+      {
+        "type": "action",
+        "description": "Initiate manual appointment creation form"
+      },
+      {
+        "type": "action",
+        "description": "Submit form with missing required fields"
+      },
+      {
+        "type": "assertion",
+        "description": "Validation errors shown for missing fields"
+      },
+      {
+        "type": "action",
+        "description": "Submit form with conflicting appointment times"
+      },
+      {
+        "type": "assertion",
+        "description": "Conflict warning or error shown preventing double booking"
+      },
+      {
+        "type": "action",
+        "description": "Submit with valid and conflict-free appointment data"
+      },
+      {
+        "type": "assertion",
+        "description": "Appointment is created and displayed on visual calendar with correct color-coded status"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Automatic Appointment Sync with Google Calendar",
+    "description": "Verify that appointments sync bi-directionally with Google Calendar events and reflect status changes appropriately.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Configure Google Calendar connection in the system"
+      },
+      {
+        "type": "action",
+        "description": "Create appointment in GuillenIA and verify event appears in Google Calendar"
+      },
+      {
+        "type": "assertion",
+        "description": "Appointment status updates reflect in Google Calendar event status"
+      },
+      {
+        "type": "action",
+        "description": "Create or update event in Google Calendar and verify it syncs back into GuillenIA appointments"
+      },
+      {
+        "type": "assertion",
+        "description": "Google Calendar changes appear in the system calendar with correct synchronization"
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Automated Daily Report Generation and CSV Export",
+    "description": "Verify that the system runs daily cron jobs to generate reports automatically and users can export these reports as CSV files.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Wait for scheduled daily report generation job to run"
+      },
+      {
+        "type": "assertion",
+        "description": "Daily reports appear in reports section (/reports)"
+      },
+      {
+        "type": "action",
+        "description": "Select and download report as CSV"
+      },
+      {
+        "type": "assertion",
+        "description": "CSV file is correctly formatted and contains expected data"
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Custom Report Generation with Filters and Email Scheduling",
+    "description": "Verify that users can generate custom reports with filters by date and agent, view metrics on screen, download CSV, and schedule email delivery.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to custom report generation in reports page"
+      },
+      {
+        "type": "action",
+        "description": "Apply date range and agent filters"
+      },
+      {
+        "type": "action",
+        "description": "Generate report and verify metrics displayed on screen"
+      },
+      {
+        "type": "action",
+        "description": "Download report as CSV and verify contents"
+      },
+      {
+        "type": "action",
+        "description": "Set up email scheduling for this report"
+      },
+      {
+        "type": "assertion",
+        "description": "Scheduled email is sent with report attached at specified intervals"
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Role-Based Access Control and Session Persistence",
+    "description": "Verify that all sensitive routes are protected by authentication and authorized by user roles, with session persistence across page reloads.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Attempt to access protected routes (/dashboard, /agents) without login"
+      },
+      {
+        "type": "assertion",
+        "description": "User is redirected to login page"
+      },
+      {
+        "type": "action",
+        "description": "Login with user having restricted role"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to access unauthorized functionality"
+      },
+      {
+        "type": "assertion",
+        "description": "Access denied or UI elements hidden appropriately"
+      },
+      {
+        "type": "action",
+        "description": "Reload page after login"
+      },
+      {
+        "type": "assertion",
+        "description": "User session persists and user remains authenticated"
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Subscription Plan Enforcement on Agent Creation Limits",
+    "description": "Verify that the system enforces subscription plan limits on the number of AI agents created, including displaying warnings and automatically blocking further creation on limit exceedance.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Identify user subscription plan with a defined agent creation limit"
+      },
+      {
+        "type": "action",
+        "description": "Create agents up to the allowed plan limit"
+      },
+      {
+        "type": "assertion",
+        "description": "Agent creation succeeds until limit reached"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to create additional agent beyond limit"
+      },
+      {
+        "type": "assertion",
+        "description": "Warning message is displayed and creation is blocked"
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "Background Job Queue Processing with Retry and Logging",
+    "description": "Verify that background jobs such as report generation, calendar sync, and email sending are processed asynchronously with proper retries on failure and detailed status logging.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Trigger background jobs for report generation and email sending"
+      },
+      {
+        "type": "assertion",
+        "description": "Jobs are processed asynchronously without blocking UI"
+      },
+      {
+        "type": "action",
+        "description": "Simulate failure in job processing (e.g. email delivery failure)"
+      },
+      {
+        "type": "assertion",
+        "description": "Job is retried according to retry policy"
+      },
+      {
+        "type": "assertion",
+        "description": "Detailed logs are maintained and accessible for job execution and failures"
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Real-Time Dashboard Metrics Accuracy and Loading States",
+    "description": "Verify that the dashboard displays accurate real-time statistics on active agents, messages, conversations, and user satisfaction with appropriate loading and error states.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to dashboard (/dashboard)"
+      },
+      {
+        "type": "assertion",
+        "description": "Dashboard shows real-time metrics accurately reflecting system state"
+      },
+      {
+        "type": "assertion",
+        "description": "Loading spinners or placeholders appear while data is loading"
+      },
+      {
+        "type": "action",
+        "description": "Simulate failure in fetching dashboard data"
+      },
+      {
+        "type": "assertion",
+        "description": "Display error message and graceful fallback UI"
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "Mobile Responsiveness and Accessibility Compliance",
+    "description": "Verify that all main pages and components are mobile responsive and comply with accessibility standards, with intuitive workflows and visual feedback.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Load main pages (dashboard, agents, conversations, appointments) on desktop and various mobile viewport sizes"
+      },
+      {
+        "type": "assertion",
+        "description": "UI elements adapt layout appropriately without overflow or clipping"
+      },
+      {
+        "type": "assertion",
+        "description": "Navigation and interactive components are usable via keyboard and screen readers"
+      },
+      {
+        "type": "action",
+        "description": "Check for presence and correctness of visual feedback mechanisms (toasts, badges, spinners)"
+      },
+      {
+        "type": "assertion",
+        "description": "All elements meet color contrast and accessibility guidelines"
+      }
+    ]
+  }
+]

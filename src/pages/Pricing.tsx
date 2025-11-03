@@ -1,12 +1,49 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, Sparkles } from "lucide-react";
-import Layout from "@/components/Layout";
+import Layout from "@/components/layout/Layout";
+import { supabase } from "@/integrations/supabase/client";
 
 const Pricing = () => {
+  const navigate = useNavigate();
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
+
+  const handlePlanSelection = async (planName: string) => {
+    try {
+      // Verificar se o usuário está autenticado
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        // Se não estiver autenticado, redirecionar para registro
+        navigate("/register");
+        return;
+      }
+
+      // Verificar se já tem organização
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: membership } = await supabase
+          .from("organization_members")
+          .select("organization_id")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (!membership) {
+          // Se não tem organização, redirecionar para criação
+          navigate("/create-organization");
+        } else {
+          // Se já tem organização, ir para dashboard
+          navigate("/dashboard");
+        }
+      }
+    } catch (error) {
+      console.error("Error handling plan selection:", error);
+      navigate("/register");
+    }
+  };
 
   const plans = [
     {
@@ -79,8 +116,8 @@ const Pricing = () => {
 
   return (
     <Layout>
-      <div className="p-4 md:p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
+      <div className="p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
           {/* Header */}
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold gradient-text">
@@ -169,6 +206,8 @@ const Pricing = () => {
                       ? "bg-gradient-primary hover:opacity-90"
                       : "bg-secondary hover:bg-secondary/80"
                   }`}
+                  onClick={() => handlePlanSelection(plan.name)}
+                  disabled={plan.cta === "Plano Atual"}
                 >
                   {plan.cta}
                 </Button>
