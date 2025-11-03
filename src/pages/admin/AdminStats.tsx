@@ -141,7 +141,7 @@ const AdminStatsContent = () => {
     return (
       <AdminLayout>
         <div className="p-4 sm:p-6 lg:p-8 w-full">
-          <div className="max-w-7xl mx-auto">
+          <div className="w-full">
             <div className="flex items-center justify-center min-h-[60vh]">
               <Card className="glass p-8 shadow-elevated">
                 <div className="flex flex-col items-center gap-4">
@@ -159,7 +159,7 @@ const AdminStatsContent = () => {
   return (
     <AdminLayout>
       <div className="p-4 sm:p-6 lg:p-8 w-full">
-        <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        <div className="w-full space-y-6 sm:space-y-8">
           {/* Header */}
           <div>
             <h1 className="text-3xl font-bold gradient-text">Estatísticas Globais</h1>

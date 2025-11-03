@@ -7,7 +7,7 @@ const AdminLogsContent = () => {
   return (
     <AdminLayout>
       <div className="p-4 sm:p-6 lg:p-8 w-full">
-        <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        <div className="w-full space-y-6 sm:space-y-8">
           <div>
             <h1 className="text-3xl font-bold gradient-text">Logs de Auditoria</h1>
             <p className="text-muted-foreground">

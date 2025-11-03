@@ -82,23 +82,21 @@ All colors MUST be HSL.
   html {
     height: 100%;
     width: 100%;
-    overflow: hidden;
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    height: 100vh;
+    @apply text-foreground font-sans antialiased;
+    min-height: 100vh;
     width: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    background-color: transparent;
     /* Fundo universo será aplicado via componente UniverseBackground */
   }
 
   #root {
-    height: 100vh;
+    min-height: 100vh;
     width: 100%;
-    overflow: hidden;
   }
 }
 

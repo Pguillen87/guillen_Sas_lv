@@ -104,59 +104,71 @@ const AdminDashboardContent = () => {
 
   return (
     <AdminLayout>
-      <div className="p-4 sm:p-6 lg:p-8 w-full">
-        <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Sparkles className="h-8 w-8 text-primary animate-float" />
+      <div className="p-6 sm:p-8 lg:p-10 xl:p-12 w-full h-full">
+        <div className="w-full space-y-8 sm:space-y-10 lg:space-y-12">
+          {/* Header - Enhanced with better spacing and visual hierarchy */}
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 sm:gap-6">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl opacity-50"></div>
+                <Sparkles className="relative h-10 w-10 sm:h-12 sm:w-12 text-primary animate-float flex-shrink-0" />
+              </div>
               <div>
-                <h1 className="text-3xl font-bold gradient-text">Dashboard Administrativo</h1>
-                <p className="text-muted-foreground">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold gradient-text leading-tight">
+                  Dashboard Administrativo
+                </h1>
+                <p className="text-sm sm:text-base text-muted-foreground mt-1.5">
                   Visão geral do sistema e gerenciamento centralizado
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Stats Grid */}
+          {/* Stats Grid - Enhanced glassmorphism with better proportions */}
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
               {[1, 2, 3, 4].map((i) => (
                 <Card
                   key={i}
-                  className="glass p-6 shadow-card animate-pulse"
+                  className="glass p-6 sm:p-7 lg:p-8 shadow-card animate-pulse rounded-2xl border-white/5 backdrop-blur-xl"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="h-4 bg-muted rounded w-24 mb-2"></div>
-                      <div className="h-8 bg-muted rounded w-16"></div>
+                    <div className="flex-1 space-y-3">
+                      <div className="h-4 bg-muted/50 rounded-lg w-28"></div>
+                      <div className="h-10 bg-muted/50 rounded-lg w-20"></div>
                     </div>
-                    <div className="w-12 h-12 bg-muted rounded-xl"></div>
+                    <div className="w-14 h-14 bg-muted/50 rounded-2xl"></div>
                   </div>
                 </Card>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
               {statCards.map((stat, index) => (
                 <Card
                   key={index}
-                  className="glass p-6 shadow-card hover:shadow-glow transition-all duration-300 cursor-pointer"
+                  className="glass p-6 sm:p-7 lg:p-8 shadow-card hover:shadow-glow hover:scale-[1.02] transition-all duration-500 rounded-2xl border-white/5 backdrop-blur-xl group cursor-pointer relative overflow-hidden"
                   onClick={() => stat.path && navigate(stat.path)}
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">{stat.title}</p>
-                      <p className="text-3xl font-bold mt-2">{stat.value}</p>
+                  {/* Subtle gradient border effect */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/0 via-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:via-primary/10 group-hover:to-primary/5 transition-all duration-500 pointer-events-none -z-10"></div>
+                  
+                  <div className="relative flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs sm:text-sm text-muted-foreground font-medium uppercase tracking-wider mb-3">
+                        {stat.title}
+                      </p>
+                      <p className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-br from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
+                        {stat.value}
+                      </p>
                       {stat.subtitle && (
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-2 font-medium">
                           {stat.subtitle}
                         </p>
                       )}
                     </div>
-                    <div className={`p-3 rounded-xl ${stat.bgColor}`}>
-                      <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                    <div className={`p-3 sm:p-3.5 rounded-2xl ${stat.bgColor} group-hover:scale-110 transition-transform duration-300 shadow-lg flex-shrink-0`}>
+                      <stat.icon className={`h-6 w-6 sm:h-7 sm:w-7 ${stat.color}`} />
                     </div>
                   </div>
                 </Card>
@@ -164,23 +176,37 @@ const AdminDashboardContent = () => {
             </div>
           )}
 
-          {/* Quick Actions */}
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Ações Rápidas</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Quick Actions - Enhanced with better glassmorphism */}
+          <div className="space-y-5 sm:space-y-6">
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent"></div>
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold gradient-text whitespace-nowrap">
+                Ações Rápidas
+              </h2>
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent"></div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
               {quickActions.map((action, index) => (
                 <Card
                   key={index}
-                  className="glass p-6 shadow-card hover:shadow-glow transition-all duration-300 cursor-pointer group"
+                  className="glass p-6 sm:p-7 lg:p-8 shadow-card hover:shadow-glow hover:scale-[1.02] transition-all duration-500 cursor-pointer group rounded-2xl border-white/5 backdrop-blur-xl relative overflow-hidden"
                   onClick={() => navigate(action.path)}
                 >
-                  <div className="flex flex-col items-center text-center space-y-3">
-                    <div className="p-4 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                      <action.icon className="h-8 w-8 text-primary" />
+                  {/* Animated background gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-accent/0 group-hover:from-primary/10 group-hover:via-primary/15 group-hover:to-accent/10 transition-all duration-500"></div>
+                  
+                  <div className="relative flex flex-col items-center text-center space-y-4 sm:space-y-5">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl group-hover:bg-primary/30 transition-colors duration-500"></div>
+                      <div className="relative p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-all duration-500 group-hover:scale-110">
+                        <action.icon className="h-8 w-8 sm:h-9 sm:w-9 text-primary relative z-10" />
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold">{action.title}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
+                    <div className="space-y-1.5">
+                      <h3 className="font-semibold text-base sm:text-lg group-hover:text-primary transition-colors duration-300">
+                        {action.title}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                         {action.description}
                       </p>
                     </div>
@@ -190,40 +216,49 @@ const AdminDashboardContent = () => {
             </div>
           </div>
 
-          {/* Recent Organizations */}
+          {/* Recent Organizations - Enhanced */}
           {recentOrganizations && recentOrganizations.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-lg sm:text-xl font-bold">Organizações Recentes</h2>
+            <div className="space-y-5 sm:space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent max-w-[100px]"></div>
+                  <h2 className="text-xl sm:text-2xl font-bold gradient-text whitespace-nowrap">
+                    Organizações Recentes
+                  </h2>
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent"></div>
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => navigate("/admin/organizations")}
+                  className="self-start sm:self-auto glass border-white/10 hover:border-primary/30"
                 >
                   Ver Todas
-                  <ArrowRight className="ml-2 h-3 w-3" />
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
-              <Card className="glass p-4 shadow-elevated">
-                <div className="space-y-2">
+              <Card className="glass p-6 sm:p-7 shadow-elevated rounded-2xl border-white/5 backdrop-blur-xl">
+                <div className="space-y-3">
                   {recentOrganizations.map((org: any) => (
                     <div
                       key={org.id}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                      className="flex items-center justify-between p-4 rounded-xl hover:bg-primary/5 transition-all duration-300 cursor-pointer group border border-transparent hover:border-primary/10"
                       onClick={() => navigate(`/admin/organizations/${org.id}`)}
                     >
-                      <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-primary/10 rounded-lg">
-                          <Building2 className="h-4 w-4 text-primary" />
+                      <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors">
+                          <Building2 className="h-5 w-5 text-primary" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium">{org.name}</p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-sm sm:text-base font-semibold group-hover:text-primary transition-colors">
+                            {org.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
                             {org.slug}
                           </p>
                         </div>
                       </div>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-xs glass border-white/10">
                         {new Date(org.created_at).toLocaleDateString("pt-BR")}
                       </Badge>
                     </div>
@@ -233,13 +268,15 @@ const AdminDashboardContent = () => {
             </div>
           )}
 
-          {/* Info/Alerts Section */}
-          <Card className="glass p-4 shadow-elevated border-blue-500/20">
-            <div className="flex items-start gap-2">
-              <AlertCircle className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
-              <div>
-                <h3 className="text-sm font-semibold mb-0.5">Painel Administrativo</h3>
-                <p className="text-xs text-muted-foreground">
+          {/* Info/Alerts Section - Enhanced */}
+          <Card className="glass p-6 sm:p-7 shadow-elevated border-blue-500/20 rounded-2xl backdrop-blur-xl">
+            <div className="flex items-start gap-4">
+              <div className="p-2 bg-blue-500/10 rounded-xl flex-shrink-0">
+                <AlertCircle className="h-5 w-5 text-blue-500" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-semibold mb-2">Painel Administrativo</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   Você tem acesso completo ao sistema. Use o menu lateral para
                   navegar entre as diferentes seções administrativas. Todas as
                   ações realizadas serão registradas nos logs de auditoria.

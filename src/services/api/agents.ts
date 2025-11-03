@@ -1,5 +1,6 @@
 import { agentService } from "../supabase/agents";
 import { organizationService } from "../supabase/organizations";
+import { subscriptionService } from "../supabase/subscriptions";
 import type {
   Agent,
   CreateAgentFormData,
@@ -61,7 +62,23 @@ export const agentsApi = {
       throw new Error("User has no organization. Please create one first.");
     }
 
-    return agentService.create(formData, membership.organization_id);
+    // Check plan limits before creating
+    const limitCheck = await subscriptionService.checkAgentLimit(membership.organization_id);
+    
+    if (!limitCheck.canCreate) {
+      throw new Error(limitCheck.reason || "Limite de agentes atingido para o plano atual.");
+    }
+
+    // Create agent
+    const agent = await agentService.create(formData, membership.organization_id);
+
+    // Return agent with warning if close to limit
+    if (limitCheck.warning) {
+      // Store warning in agent metadata (will be shown in toast by hook)
+      (agent as any).__warning = limitCheck.warning;
+    }
+
+    return agent;
   },
 
   /**

@@ -29,37 +29,65 @@ serve(async (req) => {
     const reports = [];
 
     for (const org of organizations || []) {
-      // Count messages
-      const { count: messagesCount } = await supabase
-        .from("messages")
-        .select("*", { count: "exact", head: true })
-        .gte("sent_at", yesterday.toISOString())
-        .lte("sent_at", yesterdayEnd.toISOString());
-
-      // Count conversations
-      const { count: conversationsCount } = await supabase
-        .from("conversations")
-        .select("*", { count: "exact", head: true })
-        .gte("created_at", yesterday.toISOString())
-        .lte("created_at", yesterdayEnd.toISOString())
+      // Get agents for this organization
+      const { data: agents } = await supabase
+        .from("agents")
+        .select("id")
         .eq("organization_id", org.id);
 
-      // Count appointments
-      const { count: appointmentsCount } = await supabase
-        .from("appointments")
-        .select("*", { count: "exact", head: true })
-        .gte("created_at", yesterday.toISOString())
-        .lte("created_at", yesterdayEnd.toISOString());
+      const agentIds = agents?.map((a) => a.id) || [];
 
-      // Save report
+      let messagesCount = 0;
+      let conversationsCount = 0;
+      let appointmentsCount = 0;
+
+      if (agentIds.length > 0) {
+        // Count messages by agent_ids
+        const { count: msgCount } = await supabase
+          .from("messages")
+          .select("*", { count: "exact", head: true })
+          .in("agent_id", agentIds)
+          .gte("sent_at", yesterday.toISOString())
+          .lte("sent_at", yesterdayEnd.toISOString());
+
+        messagesCount = msgCount || 0;
+
+        // Count conversations by agent_ids
+        const { count: convCount } = await supabase
+          .from("conversations")
+          .select("*", { count: "exact", head: true })
+          .in("agent_id", agentIds)
+          .gte("created_at", yesterday.toISOString())
+          .lte("created_at", yesterdayEnd.toISOString());
+
+        conversationsCount = convCount || 0;
+
+        // Count appointments by agent_ids
+        const { count: aptCount } = await supabase
+          .from("appointments")
+          .select("*", { count: "exact", head: true })
+          .in("agent_id", agentIds)
+          .gte("start_time", yesterday.toISOString())
+          .lte("start_time", yesterdayEnd.toISOString());
+
+        appointmentsCount = aptCount || 0;
+      }
+
+      // Prepare metrics JSON
+      const metrics = {
+        total_messages: messagesCount,
+        total_conversations: conversationsCount,
+        total_appointments: appointmentsCount,
+        agents_count: agentIds.length,
+      };
+
+      // Save report (using metrics JSON field)
       const { error: reportError } = await supabase
         .from("daily_reports")
         .insert({
           organization_id: org.id,
           report_date: yesterday.toISOString().split("T")[0],
-          total_messages: messagesCount || 0,
-          total_conversations: conversationsCount || 0,
-          total_appointments: appointmentsCount || 0,
+          metrics: metrics,
         });
 
       if (!reportError) {
@@ -67,6 +95,14 @@ serve(async (req) => {
           organizationId: org.id,
           date: yesterday.toISOString().split("T")[0],
           success: true,
+        });
+      } else {
+        console.error(`Error saving report for org ${org.id}:`, reportError);
+        reports.push({
+          organizationId: org.id,
+          date: yesterday.toISOString().split("T")[0],
+          success: false,
+          error: reportError.message,
         });
       }
     }

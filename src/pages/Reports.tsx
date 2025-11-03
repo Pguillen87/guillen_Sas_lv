@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import {
   TrendingUp,
@@ -9,37 +12,54 @@ import {
   Users,
   Calendar,
   Download,
+  Filter,
+  Loader2,
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { ClientRoute } from "@/components/routes/ClientRoute";
+import { reportsService, type ReportFilters } from "@/services/supabase/reports";
+import { organizationService } from "@/services/supabase/organizations";
+import { useAgents } from "@/hooks/agents/useAgents";
+import { downloadCSV, generateCSVFilename } from "@/lib/csv";
 
 const Reports = () => {
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
+  const [filters, setFilters] = useState<ReportFilters>({});
   const [stats, setStats] = useState({
     totalMessages: 0,
     totalConversations: 0,
     totalAgents: 0,
     totalAppointments: 0,
+    messagesByAgent: [] as Array<{ agentId: string; agentName: string; count: number }>,
+    messagesByDate: [] as Array<{ date: string; count: number }>,
   });
+
+  const { data: agents = [] } = useAgents();
 
   useEffect(() => {
     loadStats();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.startDate, filters.endDate, filters.agentId]);
 
   const loadStats = async () => {
     try {
-      const [messages, conversations, agents, appointments] = await Promise.all([
-        supabase.from("messages").select("*", { count: "exact", head: true }),
-        supabase.from("conversations").select("*", { count: "exact", head: true }),
-        supabase.from("agents").select("*", { count: "exact", head: true }),
-        supabase.from("appointments").select("*", { count: "exact", head: true }),
-      ]);
+      setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const membership = await organizationService.getMembership(user.id);
+      if (!membership?.organization_id) return;
+
+      const reportStats = await reportsService.getStats(membership.organization_id, filters);
 
       setStats({
-        totalMessages: messages.count || 0,
-        totalConversations: conversations.count || 0,
-        totalAgents: agents.count || 0,
-        totalAppointments: appointments.count || 0,
+        totalMessages: reportStats.totalMessages,
+        totalConversations: reportStats.totalConversations,
+        totalAgents: reportStats.totalAgents,
+        totalAppointments: reportStats.totalAppointments,
+        messagesByAgent: reportStats.messagesByAgent,
+        messagesByDate: reportStats.messagesByDate,
       });
     } catch (error: any) {
       toast.error("Erro ao carregar estatísticas");
@@ -47,6 +67,44 @@ const Reports = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleExportCSV = async () => {
+    try {
+      setExporting(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Usuário não autenticado");
+        return;
+      }
+
+      const membership = await organizationService.getMembership(user.id);
+      if (!membership?.organization_id) {
+        toast.error("Organização não encontrada");
+        return;
+      }
+
+      const csvContent = await reportsService.exportToCSV(membership.organization_id, filters);
+      const filename = generateCSVFilename("relatorio");
+      downloadCSV(csvContent, filename);
+      toast.success("Relatório exportado com sucesso!");
+    } catch (error: any) {
+      toast.error("Erro ao exportar relatório: " + (error.message || "Erro desconhecido"));
+      console.error(error);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleFilterChange = (key: keyof ReportFilters, value: string | undefined) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value || undefined,
+    }));
+  };
+
+  const clearFilters = () => {
+    setFilters({});
   };
 
   const statCards = [
@@ -89,11 +147,81 @@ const Reports = () => {
               Visualize métricas e análises detalhadas
             </p>
           </div>
-          <Button className="bg-gradient-primary hover:opacity-90">
-            <Download className="mr-2 h-4 w-4" />
-            Exportar CSV
+          <Button 
+            className="bg-gradient-primary hover:opacity-90"
+            onClick={handleExportCSV}
+            disabled={exporting || loading}
+          >
+            {exporting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Exportando...
+              </>
+            ) : (
+              <>
+                <Download className="mr-2 h-4 w-4" />
+                Exportar CSV
+              </>
+            )}
           </Button>
         </div>
+
+        {/* Filters */}
+        <Card className="glass p-6 shadow-elevated">
+          <div className="flex items-center gap-2 mb-4">
+            <Filter className="h-5 w-5 text-muted-foreground" />
+            <h2 className="text-lg font-semibold">Filtros</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="startDate">Data Inicial</Label>
+              <Input
+                id="startDate"
+                type="date"
+                value={filters.startDate || ""}
+                onChange={(e) => handleFilterChange("startDate", e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="endDate">Data Final</Label>
+              <Input
+                id="endDate"
+                type="date"
+                value={filters.endDate || ""}
+                onChange={(e) => handleFilterChange("endDate", e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="agent">Agente</Label>
+              <Select
+                value={filters.agentId || "all"}
+                onValueChange={(value) => handleFilterChange("agentId", value === "all" ? undefined : value)}
+              >
+                <SelectTrigger id="agent">
+                  <SelectValue placeholder="Todos os agentes" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os agentes</SelectItem>
+                  {agents.map((agent) => (
+                    <SelectItem key={agent.id} value={agent.id}>
+                      {agent.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-end">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={clearFilters}
+                disabled={!filters.startDate && !filters.endDate && !filters.agentId}
+              >
+                Limpar Filtros
+              </Button>
+            </div>
+          </div>
+        </Card>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -5,11 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Bot, Loader2, ArrowLeft } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Bot, Loader2, ArrowLeft, AlertTriangle, CheckCircle2 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { ClientRoute } from "@/components/routes/ClientRoute";
 import { useCreateAgent } from "@/hooks/agents/useAgents";
 import { createAgentSchema } from "@/lib/validations";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { organizationService } from "@/services/supabase/organizations";
+import { subscriptionService } from "@/services/supabase/subscriptions";
 import type { CreateAgentFormData } from "@/types";
 
 const NewAgent = () => {
@@ -22,6 +27,21 @@ const NewAgent = () => {
     customPrompt: "",
     temperature: 0.7,
     maxTokens: 1000,
+  });
+
+  // Fetch limit check
+  const { data: limitCheck, isLoading: limitCheckLoading } = useQuery({
+    queryKey: ["agent-limit-check"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const membership = await organizationService.getMembership(user.id);
+      if (!membership?.organization_id) return null;
+
+      return subscriptionService.checkAgentLimit(membership.organization_id);
+    },
+    staleTime: 30 * 1000, // 30 seconds
   });
 
   useEffect(() => {
@@ -82,6 +102,49 @@ const NewAgent = () => {
               Configure seu agente de IA personalizado
             </p>
           </div>
+
+          {/* Limit Warning/Info */}
+          {!limitCheckLoading && limitCheck && (
+            <Card className="glass p-4 shadow-elevated">
+              {!limitCheck.canCreate ? (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    <div className="font-semibold mb-1">Limite atingido</div>
+                    <div>{limitCheck.reason}</div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-3"
+                      onClick={() => navigate("/pricing")}
+                    >
+                      Ver Planos
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              ) : limitCheck.warning ? (
+                <Alert>
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    <div className="font-semibold mb-1">Atenção: Próximo do limite</div>
+                    <div>{limitCheck.warning}</div>
+                    <div className="mt-2 text-sm">
+                      Plano atual: <strong>{limitCheck.limits.planName}</strong> ({limitCheck.usage.currentAgents}/{limitCheck.limits.maxAgents === null ? "∞" : limitCheck.limits.maxAgents} agentes)
+                    </div>
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <Alert>
+                  <CheckCircle2 className="h-4 w-4" />
+                  <AlertDescription>
+                    <div className="text-sm">
+                      Plano atual: <strong>{limitCheck.limits.planName}</strong> ({limitCheck.usage.currentAgents}/{limitCheck.limits.maxAgents === null ? "∞" : limitCheck.limits.maxAgents} agentes)
+                    </div>
+                  </AlertDescription>
+                </Alert>
+              )}
+            </Card>
+          )}
 
           {/* Form */}
           <Card className="glass p-8 shadow-elevated">
@@ -191,7 +254,7 @@ const NewAgent = () => {
                 <Button
                   type="submit"
                   className="flex-1 bg-gradient-primary hover:opacity-90"
-                  disabled={createAgent.isPending}
+                  disabled={createAgent.isPending || (!limitCheckLoading && limitCheck && !limitCheck.canCreate)}
                 >
                   {createAgent.isPending ? (
                     <>

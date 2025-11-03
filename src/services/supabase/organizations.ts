@@ -34,10 +34,28 @@ export const organizationService = {
    * Create organization
    */
   async create(organization: OrganizationInsert, userId: string) {
-    // Create organization
+    // Get Free plan ID
+    const { data: freePlan, error: planError } = await supabase
+      .from("subscription_plans")
+      .select("id")
+      .eq("slug", "free")
+      .eq("is_active", true)
+      .maybeSingle();
+
+    if (planError) {
+      console.error("Error fetching free plan:", planError);
+      // Continue without plan assignment if query fails
+    }
+
+    // Create organization with Free plan
+    const orgData = {
+      ...organization,
+      subscription_plan_id: freePlan?.id || null,
+    };
+
     const { data: org, error: orgError } = await supabase
       .from("organizations")
-      .insert(organization)
+      .insert(orgData)
       .select()
       .single();
 

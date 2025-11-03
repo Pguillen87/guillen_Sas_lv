@@ -26,9 +26,14 @@ export function useCreateAgent() {
 
   return useMutation({
     mutationFn: (formData: CreateAgentFormData) => agentsApi.create(formData),
-    onSuccess: () => {
+    onSuccess: (agent: any) => {
       queryClient.invalidateQueries({ queryKey: ["agents"] });
       toast.success("Agente criado com sucesso!");
+      
+      // Show warning if close to limit
+      if (agent?.__warning) {
+        toast.warning(agent.__warning, { duration: 6000 });
+      }
     },
     onError: (error: any) => {
       toast.error(error.message || "Erro ao criar agente");

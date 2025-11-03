@@ -30,11 +30,11 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative w-full">
       <UniverseBackground variant="expansive" intensity="high" showNebula={true} />
       {/* Hero Section */}
-      <div className="relative overflow-hidden z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
+      <div className="relative z-10 h-screen flex items-center justify-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="text-center space-y-8">
             <div className="inline-flex items-center gap-3 mb-6">
               <Sparkles className="h-12 w-12 text-primary animate-float" />

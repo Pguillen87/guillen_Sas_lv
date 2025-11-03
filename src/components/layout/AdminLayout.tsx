@@ -82,7 +82,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   ];
 
   return (
-    <div className="min-h-screen flex bg-background relative">
+    <div className="h-screen flex bg-background relative overflow-hidden w-full">
       <UniverseBackground variant="admin" intensity="low" showNebula={true} />
       {/* Mobile Menu Button */}
       <button
@@ -95,7 +95,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed lg:static inset-y-0 left-0 z-40 w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300",
+          "fixed inset-y-0 left-0 z-40 w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
@@ -186,7 +186,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto relative z-10">{children}</main>
+      <main className="flex-1 overflow-auto relative z-10 lg:ml-64 min-w-0">{children}</main>
     </div>
   );
 };

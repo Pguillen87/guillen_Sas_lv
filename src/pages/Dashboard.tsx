@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -124,90 +124,117 @@ const Dashboard = () => {
   return (
     <ClientRoute>
       <Layout>
-        <div className="p-4 sm:p-6 lg:p-8 w-full">
-        <div className="w-full space-y-6 sm:space-y-8">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Sparkles className="h-8 w-8 text-primary animate-float" />
-              <div>
-                <h1 className="text-3xl font-bold gradient-text">Dashboard</h1>
-                <p className="text-muted-foreground">
-                  Bem-vindo ao seu portal de gestão
-                </p>
+        <div className="p-6 sm:p-8 lg:p-10 xl:p-12 w-full">
+          <div className="w-full max-w-[1920px] mx-auto space-y-8 sm:space-y-10 lg:space-y-12">
+            {/* Header - Enhanced with better spacing and visual hierarchy */}
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 sm:gap-6">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl opacity-50"></div>
+                  <Sparkles className="relative h-10 w-10 sm:h-12 sm:w-12 text-primary animate-float" />
+                </div>
+                <div>
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold gradient-text leading-tight">
+                    Dashboard
+                  </h1>
+                  <p className="text-sm sm:text-base text-muted-foreground mt-1.5">
+                    Bem-vindo ao seu portal de gestão
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats Grid - Enhanced glassmorphism with better proportions */}
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
+                {[1, 2, 3, 4].map((i) => (
+                  <Card
+                    key={i}
+                    className="glass p-6 sm:p-7 lg:p-8 shadow-card animate-pulse rounded-2xl border-white/5 backdrop-blur-xl"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 space-y-3">
+                        <div className="h-4 bg-muted/50 rounded-lg w-28"></div>
+                        <div className="h-10 bg-muted/50 rounded-lg w-20"></div>
+                      </div>
+                      <div className="w-14 h-14 bg-muted/50 rounded-2xl"></div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
+                {statCards.map((stat, index) => (
+                  <Card
+                    key={index}
+                    className="glass p-6 sm:p-7 lg:p-8 shadow-card hover:shadow-glow hover:scale-[1.02] transition-all duration-500 rounded-2xl border-white/5 backdrop-blur-xl group cursor-default"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm text-muted-foreground font-medium uppercase tracking-wider mb-3">
+                          {stat.title}
+                        </p>
+                        <p className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-br from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
+                          {stat.value}
+                        </p>
+                      </div>
+                      <div className={`p-3 sm:p-3.5 rounded-2xl ${stat.bgColor} group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                        <stat.icon className={`h-6 w-6 sm:h-7 sm:w-7 ${stat.color}`} />
+                      </div>
+                    </div>
+                    {/* Subtle gradient border effect */}
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/0 via-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:via-primary/10 group-hover:to-primary/5 transition-all duration-500 pointer-events-none -z-10"></div>
+                  </Card>
+                ))}
+              </div>
+            )}
+
+            {/* Charts - Enhanced container */}
+            <div className="glass rounded-2xl border-white/5 backdrop-blur-xl shadow-card p-6 sm:p-8 lg:p-10">
+              <DashboardCharts data={chartData} />
+            </div>
+
+            {/* Quick Actions - Enhanced with better glassmorphism */}
+            <div className="space-y-5 sm:space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent"></div>
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold gradient-text whitespace-nowrap">
+                  Ações Rápidas
+                </h2>
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent"></div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
+                {quickActions.map((action, index) => (
+                  <Card
+                    key={index}
+                    className="glass p-6 sm:p-7 lg:p-8 shadow-card hover:shadow-glow hover:scale-[1.02] transition-all duration-500 cursor-pointer group rounded-2xl border-white/5 backdrop-blur-xl relative overflow-hidden"
+                    onClick={action.action}
+                  >
+                    {/* Animated background gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-accent/0 group-hover:from-primary/10 group-hover:via-primary/15 group-hover:to-accent/10 transition-all duration-500"></div>
+                    
+                    <div className="relative flex flex-col items-center text-center space-y-4 sm:space-y-5">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl group-hover:bg-primary/30 transition-colors duration-500"></div>
+                        <div className="relative p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-all duration-500 group-hover:scale-110">
+                          <action.icon className="h-8 w-8 sm:h-9 sm:w-9 text-primary relative z-10" />
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        <h3 className="font-semibold text-base sm:text-lg group-hover:text-primary transition-colors duration-300">
+                          {action.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                          {action.description}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
               </div>
             </div>
           </div>
-
-          {/* Stats Grid */}
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map((i) => (
-                <Card
-                  key={i}
-                  className="glass p-6 shadow-card animate-pulse"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="h-4 bg-muted rounded w-24 mb-2"></div>
-                      <div className="h-8 bg-muted rounded w-16"></div>
-                    </div>
-                    <div className="w-12 h-12 bg-muted rounded-xl"></div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {statCards.map((stat, index) => (
-                <Card
-                  key={index}
-                  className="glass p-6 shadow-card hover:shadow-glow transition-all duration-300"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">{stat.title}</p>
-                      <p className="text-3xl font-bold mt-2">{stat.value}</p>
-                    </div>
-                    <div className={`p-3 rounded-xl ${stat.bgColor}`}>
-                      <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          )}
-
-          {/* Charts */}
-          <DashboardCharts data={chartData} />
-
-          {/* Quick Actions */}
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Ações Rápidas</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {quickActions.map((action, index) => (
-                <Card
-                  key={index}
-                  className="glass p-6 shadow-card hover:shadow-glow transition-all duration-300 cursor-pointer group"
-                  onClick={action.action}
-                >
-                  <div className="flex flex-col items-center text-center space-y-3">
-                    <div className="p-4 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                      <action.icon className="h-8 w-8 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">{action.title}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {action.description}
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
         </div>
-      </div>
       </Layout>
     </ClientRoute>
   );

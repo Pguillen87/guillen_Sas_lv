@@ -1,19 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Sparkles, Loader2 } from "lucide-react";
 import { UniverseBackground } from "@/components/universe/UniverseBackground";
+
+const REMEMBER_ME_KEY = "guillenia_remember_me";
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Carregar preferência de "lembrar senha" ao montar o componente
+  useEffect(() => {
+    const savedRememberMe = localStorage.getItem(REMEMBER_ME_KEY);
+    if (savedRememberMe === "true") {
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +66,9 @@ const Login = () => {
         setLoading(false);
         return;
       }
+
+      // Salvar preferência de "lembrar senha"
+      localStorage.setItem(REMEMBER_ME_KEY, rememberMe.toString());
 
       // Verificar se usuário é admin
       const { checkAdminAccess } = await import("@/lib/admin");
@@ -121,6 +136,21 @@ const Login = () => {
                   disabled={loading}
                   autoComplete="new-password"
                 />
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="remember-me"
+                  checked={rememberMe}
+                  onCheckedChange={(checked) => setRememberMe(checked === true)}
+                  disabled={loading}
+                />
+                <Label
+                  htmlFor="remember-me"
+                  className="text-sm font-normal cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Lembrar senha
+                </Label>
               </div>
 
               <Button
